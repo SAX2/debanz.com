@@ -1,0 +1,28 @@
+.container {
+  width: 100%;
+  padding: 2rem;
+  display: flex;
+  justify-content: center;
+  gap: 5rem;
+}
+
+.filter {
+  max-width: 300px;
+  width: 100%;
+}
+
+.section {
+  max-width: 1200px;
+  width: 100%;
+}
+
+.section h1 {
+  padding-bottom: 3rem;
+  font-size: 22px;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+}

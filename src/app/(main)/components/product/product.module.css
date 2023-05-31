@@ -1,0 +1,165 @@
+.product_list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-gap: 5px;
+}
+
+@media (max-width: 768px) {
+  .product_list {
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: minmax(0, auto);
+  }
+}
+
+.container * {
+  text-decoration: none;
+  color: var(--black);
+}
+
+.container {
+  /* max-width: 285px; */
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  position: static;
+}
+
+.image {
+  display: flex;
+  align-items: center;
+  border-radius: 2.5px;
+  max-width: 100%;
+  max-height: 400px;
+  height: fit-content;
+  background: #fafafa;
+}
+
+.image img {
+  border-radius: 5px;
+  width: 100%;
+  height: auto;
+}
+
+.product_info {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.product_info p {
+  text-align: center;
+}
+
+.product_info .name {
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+.price {
+  height: 31px;
+}
+
+.add_to_cart {
+  display: none;
+  padding: 5px 10px;
+  border-radius: 2.5px;
+  background: var(--black);
+  color: var(--white);
+  border: none;
+  font-size: .9rem;
+  font-weight: 400;
+  transition: opacity 200ms;
+}
+
+.add_to_cart:disabled {
+  opacity: 0.8;
+}
+
+.container:hover .product_info p {
+  display: none;
+}
+
+.container:hover .add_to_cart {
+  display: flex ;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  transition: all 300ms;
+}
+
+.add_to_cart .add_icon {
+  align-items: center;
+  display: none;
+  opacity: 0;
+  transition: all 150ms;
+}
+
+.container:hover .add_to_cart .add_icon {
+  display: flex;
+  animation: onHover 300ms forwards alternate;
+  opacity: 1;
+}
+
+@keyframes onHover {
+  from {
+    transform: translateX(-10px);
+    opacity: 0;
+  } to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.container:hover .sizes_container {
+  display: flex;
+}
+
+.sizes_container {
+  display: none;
+  gap: 5px;
+  justify-content: center;
+}
+
+.size {
+  cursor: pointer;
+  width: 25px;
+  height: 25px;
+  padding: 10px;
+  background: transparent;
+  border: 1px solid #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: .8rem;
+}
+
+.notFound {
+  height: 50vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notFound p {
+  text-align: center;
+  color: #aaa;
+  font-size: 2rem;
+}
+
+@media (max-width: 600px) {
+  .add_to_cart {
+    font-size: .8rem;
+  }
+
+  .product_info .name {
+    font-size: 1rem;
+  }
+
+  .product_info .price {
+    font-size: .8rem;
+  }
+}

@@ -1,0 +1,13 @@
+.container {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 1rem;
+  background: #000;
+}
+
+.container p {
+  font-size: .8rem;
+  color: #fff;
+}

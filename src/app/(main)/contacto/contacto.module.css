@@ -1,0 +1,130 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 2rem;
+  width: 100%;
+  height: 80vh;
+  justify-content: center;
+  align-items: center;
+}
+
+.mailto {
+  width: fit-content;
+  padding: 5px;
+  border-radius: 2.5px;
+  background: #eee;
+  text-decoration: none;
+  color: #000;
+  transition: all 150ms;
+}
+
+.mailto:hover {
+  background: #ddd;
+}
+
+.form {
+  max-width: 500px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form input,
+.form textarea {
+  height: 40px;
+  border: 1px solid #ccc;
+  border-radius: 2.5px;
+  outline: none;
+  padding: 10px;
+  font-size: 1rem;
+  width: auto;
+  transition: border-color 100ms;
+}
+
+.form textarea {
+  resize: none;
+  max-height: 200px;
+  height: 100%;
+}
+
+.form textarea::-webkit-scrollbar-track {
+  border: 1px solid transparent;
+  background-color: transparent;
+}
+
+.form textarea::-webkit-scrollbar {
+  width: 2.5px;
+}
+
+.form textarea::-webkit-scrollbar-thumb {
+  border-radius: 1px;
+  width: 5px;
+  background-color: #eee;
+}
+
+.form input::placeholder,
+.form textarea::placeholder {
+  color: #ccc;
+}
+
+.form input:focus,
+.form textarea:focus {
+  border-color: #000;
+}
+
+.row {
+  display: flex;
+  gap: 1rem;
+}
+
+.row input {
+  width: 100%;
+}
+
+.btn {
+  cursor: pointer;
+  height: 40px;
+  border: 0;
+  background: #000;
+  border-radius: 2.5px;
+  color: #fff;
+  font-weight: 500;
+}
+
+.social {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.social div {
+  display: flex;
+  gap: 1rem;
+}
+
+.social_items {
+  padding: 5px;
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  text-decoration: none;
+}
+
+.social_items:last-child {
+  gap: 0;
+}
+
+.social_items span {
+  font-size: 1.1rem;
+  color: #000;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+}
