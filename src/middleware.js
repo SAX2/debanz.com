@@ -5,6 +5,8 @@ export async function middleware(req) {
   const res = NextResponse.next();
   const supabase = createMiddlewareClient({ req, res });
 
+  const status = false;
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -24,6 +26,7 @@ export async function middleware(req) {
       req.nextUrl.pathname == "/devoluciones-cambios" ||
       req.nextUrl.pathname == "/envios")
   ) {
+    if (!status) return res;
     return NextResponse.redirect(new URL("/password", req.url));
   }
 
