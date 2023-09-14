@@ -1,30 +1,101 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
 
 :root {
-  --black: #000;
-  --grey: #F6F6F6;
-  --white: #fff;
+  --black: #0A0A0A;
+  --black-2: #595A5C;
+
+  --grey: #C2C2C2;
+  --grey2: #AAA;
+
+  --white: #FFF;
   --padding-desktop: 2rem;
   --padding-phone: 1rem;
+  --border-grey-low: rgba(170, 170, 170, 0.20);
+  --green: #7AFF97;
+  --red: #E04343;
+  --yellow: #FFDA56;
+  --radius-low: 2.5px;
+  --radius-med: 5px;
+  --radius-high: 10px;
+
+  --text-sm: 12px;
+  --text-m: 14px;
+  --text-base: 16px;
+  --text-l: 18px;
+  --text-xl: 20px;
+  --text-xl2: 22px;
+  --text-xl3: 24px;
+  --text-xl4: 26px;
+
+  --divider-white: #DEDEDE;
+}
+
+::selection {
+  background-color: #000000;
+  color: #ffffff;
 }
 
 * {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
-  font-family: 'Roboto', sans-serif;
 }
 
 body {
+  background: #fff;
   overflow-x: hidden;
 }
 
+body {
+  min-height: 100vh;
+  min-height: fill-available;
+  min-height: -webkit-fill-available;
+}
+html {
+  height: fill-available;
+  height: -webkit-fill-available;
+}
+
 .backgorund-modal {
-  top: 0;
   position: absolute;
   width: 100%;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.2);
+  height: 100dvh;
+  background: rgba(10, 10, 10, 0.3);
+  backdrop-filter: blur(5px);
+  animation: on .5s forwards;
+}
+
+.backgorund-modal-close {
+  animation: off .5s forwards;
+}
+
+@keyframes on {
+  from {
+    opacity: 0;
+  } to {
+    opacity: 1;
+  }
+}
+
+@keyframes off {
+  from {
+    opacity: 1;
+  } to {
+    opacity: 0;
+  }
+}
+
+.divider_black,
+.divider_white {
+  width: 100%;
+  height: 1px;
+}
+
+.divider_black {
+  background: #111318;
+}
+
+.divider_white {
+  background: #DEDEDE;
 }
 
 .separator {
@@ -41,3 +112,9 @@ body {
 .price {
   unicode-bidi: isolate;
 }
+
+/* @media (max-width: 500px) {
+  .backgorund-modal {
+    display: none;
+  }
+} */

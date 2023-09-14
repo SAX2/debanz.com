@@ -3,33 +3,43 @@ import { useState } from 'react';
 import { useCartContext } from '@/app/context/CartContext';
 import { MinusIcon, PlusIcon } from '@/app/components/Icons';
 import { toast } from 'sonner';
+import { useBagContext } from '@/app/context/BagContext';
 import style from './productById.module.css';
-import domain from '@/app/config';
+import useFormatText from '@/app/hooks/useFormatText';
+import Accordion from '../../components/accordion/Accordion';
+import { addToCart, updateCart } from '@/app/utils/shopify';
 
-const AddToCart = ({ data, setSelectedSize, size }) => {
-  const { addToBag } = useCartContext();
+const AddToCart = ({ quantity, size }) => {
+  const { setOpenBag } = useBagContext()
+  const { countOfProducts } = useCartContext()
 
-  const indexOf = data.sizes !== null ? data.sizes.findIndex(s => s == data.size) : 0
+  const handleAddToCart = async () => {
+    let cartId = sessionStorage.getItem("cartId");
+    if (quantity > 0) {
+      if (cartId) {
+        await updateCart(cartId, size.id, quantity);
+        await countOfProducts(cartId);
+        setOpenBag(true)
+      } else {
+        const { data } = await addToCart(size.id, quantity);
+        setOpenBag(true)
+        cartId = data.cartCreate.cart.id;
+        sessionStorage.setItem("cartId", cartId);
+      }
+    }
+  };
 
   return (
     <button
-      className={style.add_to_cart}
-      onClick={() => {
-        if (size.length == 0)
-          toast.error(
-            "Seleccione un talle de la prenda para agregar al carrito"
-          );
-        else addToBag({ ...data });
-      }}
-      disabled={data.stock[indexOf] == 0 ? true : false}
-      style={data.stock[indexOf] == 0 ? { background: "#f6f6f6", color: "#000"} : null}
+      className={`${style.add_to_cart} ${size.currentlyNotInStock ? style.no_stock : style.stock}`}
+      onClick={handleAddToCart}
+      disabled={size.currentlyNotInStock}
+      style={size.currentlyNotInStock ? { background: "#f6f6f6", color: "#000", animation: "none"} : null}
     >
-      {data.stock[indexOf] == 0 ? "SIN STOCK" : "AGREGAR AL CARRITO"}
+      <span>{size.currentlyNotInStock ? "SIN STOCK" : "AGREGAR AL CARRITO"}</span>
       <div
         className={style.add_icon}
-        style={
-          data.stock[indexOf] == 0 ? { display: "none" } : {}
-        }
+        style={size.currentlyNotInStock ? { animation: "none", opacity: 0 } : {}}
       >
         <PlusIcon bg="#fff" heigth="1rem" width="1rem" />
       </div>
@@ -38,57 +48,54 @@ const AddToCart = ({ data, setSelectedSize, size }) => {
 }
 
 export default function ProductInfo({ data }) {
-  const [selectedSize, setSelectedSize] = useState("M")
-  const [quantity, setQuantity] = useState(1)
-  // const sizes = JSON.parse(data.sizes)
+  const [selectedSize, setSelectedSize] = useState(data.variants.edges[0].node);
+  const [quantity, setQuantity] = useState(1);
+  const { formatPrice } = useFormatText()
 
-  const indexOfSelectedSize = data.sizes != null ? data.sizes.indexOf(selectedSize) : 0;
+  // const indexOfSelectedSize = data.sizes != null ? data.sizes.indexOf(selectedSize) : 0;
 
   return (
     <div className={style.section}>
       <div className={style.title}>
-        <h1>{data.name}</h1>
-        <p>${data.price}</p>
+        <h1>{data.title}</h1>
+        <bdi className="price">
+          <span className="price_icon">$</span>
+          {formatPrice(parseInt(data.priceRange.minVariantPrice.amount))}
+        </bdi>
       </div>
       <div className={style.sizes}>
-        {data.sizes != null ? (data.sizes.map((s) => {
-          return (
-            <div
-              className={style.size}
-              key={s}
-              onClick={() => {
-                setSelectedSize(s)
-                setQuantity((q) => q >= data.stock[data.sizes.indexOf(s)] ? data.stock[data.sizes.indexOf(s)] : q)
-              }}
-              style={
-                selectedSize == s
-                  ? { background: "#000", color: "#fff" }
-                  : { background: "#fff", color: "#000" }
-              }
-            >
-              {s}
-            </div>
-          );
-        })) : (<div>TALLE UNICO</div>) }
+        {data.variants != null ? (
+          data.variants.edges.map((variant) => {
+            return (
+              <div
+                className={`${
+                  variant.node.currentlyNotInStock ? style.size_nostock : null
+                } ${
+                  selectedSize.id == variant.node.id
+                    ? style.size_selected
+                    : style.size
+                }`}
+                key={variant.node.id}
+                onClick={() => {
+                  if (variant.node.currentlyNotInStock) return;
+                  return setSelectedSize(variant.node);
+                }}
+              >
+                {variant.node.title}
+              </div>
+            );
+          })
+        ) : (
+          <div>TALLE UNICO</div>
+        )}
       </div>
       <div className={style.cart}>
-        <div className={style.quantity}>
-          <button onClick={() => setQuantity((q) => (q > 1 ? q - 1 : 1))}>
-            <MinusIcon bg="#aaa" width="22px" heigth="auto" />
-          </button>
-          <p>{quantity}</p>
-          <button onClick={() => setQuantity((q) => q >= data.stock[indexOfSelectedSize] ? q : q + 1)}>
-            <PlusIcon bg="#aaa" width="22px" heigth="auto" />
-          </button>
-        </div>
         <AddToCart
-          data={{ ...data, total: quantity, size: selectedSize, images: data.images.map(i => domain(`/${i}`)) }}
-          setSelectedSize={setSelectedSize}
+          quantity={quantity}
           size={selectedSize}
         />
       </div>
-      <div className="separator"></div>
-      <div className={style.description}></div>
+      <Accordion desc={data.description} />
     </div>
   );
 }

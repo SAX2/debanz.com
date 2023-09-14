@@ -8,13 +8,14 @@
 }
 
 .section {
-  max-width: 1200px;
+  max-width: 1400px;
   width: 100%;
 }
 
-.section h1 {
-  padding-bottom: 3rem;
-  font-size: 22px;
+.section .title {
+  padding: 2rem 0;
+  font-size: var(--text-xl3);
+  text-align: center;
 }
 
 .image {
@@ -24,10 +25,9 @@
   margin-bottom: 2rem;
 }
 
-@media (max-width: 550px) {
-  .section h1 {
-    font-size: 1.2rem;
-    text-align: center;
+@media (max-width: 768px) {
+  .section .title {
+    font-size: var(--text-l);
   }
 
   .container {

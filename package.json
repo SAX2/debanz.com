@@ -9,11 +9,18 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@shopify/hydrogen-react": "^2023.7.1",
+    "@shopify/shopify-api": "^7.5.1",
+    "@supabase/auth-helpers-nextjs": "^0.7.4",
+    "@supabase/supabase-js": "^2.31.0",
     "dotenv": "^16.0.3",
+    "encoding": "^0.1.13",
     "jsonwebtoken": "^9.0.0",
     "next": "13.4.3",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-fast-marquee": "^1.6.0",
+    "react-slick": "^0.29.0",
     "sonner": "^0.3.5",
     "uuid": "^9.0.0"
   }

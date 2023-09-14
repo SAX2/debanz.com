@@ -1,25 +1,64 @@
 "use client";
-import { BackIcon, CloseIcon, MinusIcon, PlusIcon, TrashIcon } from "../../../components/Icons";
-import { useCartContext } from '../../../context/CartContext'
+
+import { CloseIcon, MinusIcon, PlusIcon } from "../../../components/Icons";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { retrieveCart, updateItemQuantityCart } from "@/app/utils/shopify";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
-import { getShipmentPrice } from "@/app/config";
 import useFormatText from "@/app/hooks/useFormatText";
-import { toast } from "sonner";
+import { useCartContext } from "@/app/context/CartContext";
 
-const BagProduct = ({ data, style }) => {
-  const { deleteFromBag, subtractCounter, addCounter } = useCartContext();  
+const BagProduct = ({ data, style, cartId, setCart }) => {
   const { formatPrice } = useFormatText();
-  console.log(formatPrice(data.price))
+  const { countOfProducts } = useCartContext();
+
+  const addFunction = async () => {
+    const quantity = data.quantity + 1;
+    const update = await updateItemQuantityCart({
+      cartId: cartId,
+      itemId: data.id,
+      quantity: quantity
+    });
+    const updatedItem = update.lines.edges.filter(i => i.node.id == data.id)
+    if (updatedItem && updatedItem[0].node.quantity == data.quantity) {
+      toast.error("No se puede agregar mas cantidad a este producto.");
+    }
+    data.quantity = quantity
+    await countOfProducts(cartId);
+    return setCart(update)
+  }
+
+  const substractFunction = async () => {
+    const quantity = data.quantity - 1;
+    const update = await updateItemQuantityCart({
+      cartId: cartId,
+      itemId: data.id,
+      quantity: quantity
+    });
+    data.quantity = quantity
+    await countOfProducts(cartId);
+    return setCart(update);
+  }
+
+  const deleteFromCart = async () => {
+    const update = await updateItemQuantityCart({
+      cartId: cartId,
+      itemId: data.id,
+      quantity: 0,
+    });
+    await countOfProducts(cartId);
+    return setCart(update);
+  }
 
   return (
     <div className={style.bag_product_container}>
       <div className={style.bag_p_main}>
         <div className={style.bag_p_image_container}>
           <Image
-            src={data.images[0]}
+            src={data.merchandise.image.url}
             alt={data.name}
+            title={data.name}
             width={330}
             height={330}
           />
@@ -27,34 +66,34 @@ const BagProduct = ({ data, style }) => {
         <div className={style.bag_p_info}>
           <div className={style.bag_p_info_top}>
             <div>
-              <p className={style.bag_p_title}>{data.name}</p>
+              <p className={style.bag_p_title}>
+                {data.merchandise.product.title}
+              </p>
               <div className={style.bag_p_options}>
-                <button onClick={() => deleteFromBag(data)}>Quitar</button>
+                <button onClick={deleteFromCart}>Quitar</button>
               </div>
             </div>
-            <p className={style.bag_p_size}>TALLE: {data.size}</p>
+            <p className={style.bag_p_size}>{data.merchandise.title}</p>
           </div>
           <div className={style.bag_p_info_bottom}>
             <div className={style.bag_p_counter_container}>
               <button
                 className={style.bag_p_counter_button}
-                onClick={() => subtractCounter(data.id, data.size)}
+                onClick={substractFunction}
               >
                 <MinusIcon width={16} heigth={16} bg={`#AAA`} />
               </button>
-              <span>{data.total}</span>
+              <span>{data.quantity}</span>
               <button
                 className={style.bag_p_counter_button}
-                onClick={() =>
-                  data.total + 1 > data.stock ? null : addCounter(data)
-                }
+                onClick={addFunction}
               >
                 <PlusIcon width={16} heigth={16} bg={`#AAA`} />
               </button>
             </div>
             <bdi className="price">
               <span className="price_icon">$</span>
-              {formatPrice(data.price)}
+              {formatPrice(parseInt(data.cost.totalAmount.amount))}
             </bdi>
           </div>
         </div>
@@ -62,155 +101,118 @@ const BagProduct = ({ data, style }) => {
     </div>
   );
 }
+ 
 
-export default function Bag({ setOpenBag, style }) {
-  const { cart } = useCartContext();  
-  const { formatPrice } = useFormatText()
-  const [shipIsOpen, setShipIsOpen] = useState(false)
-  const [shippingData, setShippingData] = useState({ zip_code: "", weigth: 200 })
-  const [shippingPrice, setShippingPrice] = useState(0)
+export const CloseButton = ({ setOpenBag, style, setStyleClass }) => {
+  return <button
+    className={style.m_close_button}
+    onClick={() => {
+      setStyleClass(true);
+      setTimeout(() => {
+        setStyleClass(false);
+        setOpenBag((bag) => !bag);
+      }, 400);
+    }}
+  >
+    <CloseIcon bg="#000" width={20} heigth={20} />
+  </button>;
+};
 
+export default function Bag({ setOpenBag, style, setStyleClass }) {
+  const [cart, setCart] = useState();
+  const cartId = sessionStorage.getItem('cartId')
 
-  const handleSubbmit = async (e) => {
-    e.preventDefault();
-    // cart.items.map(p => {
-    //   setShippingData({
-    //     ...shippingData,
-    //     weigth: p.weight + shippingData.weigth,
-    //   });
-    // })
-    if (shippingData.zip_code.length == 0) return setShippingPrice(0)
-    const data = await getShipmentPrice({ zip_code: shippingData.zip_code, weight: shippingData.weigth })
-    if (data == undefined) return toast.error('Ingrese un codigo postal valido')
-    return setShippingPrice(data.tax_price);
-  }
+  const { formatPrice } = useFormatText();
+
+  const fetchCart = async (cartId) => {
+    const data = await retrieveCart(cartId);
+    if (data == null) return;
+    return setCart(data);
+  };
+  
+  useEffect(() => {
+    if (!cartId) return;
+    fetchCart(cartId);
+  }, []);
 
   return (
     <div className={style.b_container}>
-      <div className={style.b_top}>
-        <div className={style.b_head_container}>
-          <p>CARRITO DE COMPRAS</p>
-          <button
-            className={style.m_close_button}
-            onClick={() => setOpenBag((bag) => !bag)}
+      {!cartId || !cart ? (
+        <div className={style.b_top} style={{ height: "100%" }}>
+          <div className={style.b_head_container}>
+            <h1>CARRITO DE COMPRAS</h1>
+            <CloseButton
+              setOpenBag={setOpenBag}
+              setStyleClass={setStyleClass}
+              style={style}
+            />
+          </div>
+          <div
+            style={{
+              height: "100%",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
           >
-            <CloseIcon bg="#000" width={20} heigth={20} />
-          </button>
+            <p style={{ color: "#aaa", fontSize: 22 }}>El Carrito esta vacio</p>
+          </div>
         </div>
-        <div className={style.b_body_container}>
-          {cart.items.length < 1 ? (
-            <div
-              style={{
-                height: "100%",
-                display: "flex",
-                justifyContent: "center",
-              }}
-            >
-              <p
-                style={{ color: "#aaa", fontSize: 22, marginTop: "calc(70%)" }}
-              >
-                El Carrito esta vacio
-              </p>
-            </div>
-          ) : (
+      ) : (
+        <>
+          {cart !== undefined && (
             <>
-              {cart.items.map((item, index) => {
-                if (index == 0)
-                  return <BagProduct data={item} key={item.id} style={style} />;
-                else
-                  return (
-                    <>
-                      <div className="separator"></div>
-                      <BagProduct data={item} key={item.id} style={style} />
-                    </>
-                  );
-              })}
-            </>
-          )}
-        </div>
-      </div>
-      <div className={style.b_bottom}>
-        {cart.items.length > 0 && (
-          <>
-            <div className={style.b_ship_container}>
-              <button
-                onClick={() => setShipIsOpen((prevState) => !prevState)}
-                className={style.b_ship_open_btn}
-              >
-                <div
-                  className={
-                    shipIsOpen
-                      ? style.b_ship_open_btn_svg_open
-                      : style.b_ship_open_btn_svg
-                  }
-                >
-                  <BackIcon bg={"#000"} height={20} width={20} />
+              <div className={style.b_top}>
+                <div className={style.b_head_container}>
+                  <h1>CARRITO DE COMPRAS</h1>
+                  <CloseButton
+                    setOpenBag={setOpenBag}
+                    setStyleClass={setStyleClass}
+                    style={style}
+                  />
                 </div>
-                CALCULAR ENVIO
-              </button>
-              <div
-                className={style.b_ship}
-                style={shipIsOpen ? { display: "flex" } : { display: "none" }}
-              >
-                <form onSubmit={(e) => handleSubbmit(e)}>
-                  <div className={style.form}>
-                    <div>
-                      <p>Shipnow - Entrega Estandar</p>
-                    </div>
-                    <div>
-                      <input
-                        type="text"
-                        placeholder="Codigo postal"
-                        onChange={(e) =>
-                          setShippingData({
-                            ...shippingData,
-                            zip_code: e.target.value,
-                          })
-                        }
-                        value={shippingData.zip_code}
-                      />
-                      <input type="submit" value="Calcular" />
-                    </div>
-                  </div>
-                  <div className={style.b_shipping_price_container}>
-                    <p>Precio</p>
-                    {shippingPrice == 0 ? null : (
-                      <bdi className="price">
-                        <span className="price_icon">$</span>
-                        {formatPrice(shippingPrice)}
-                      </bdi>
-                    )}
-                  </div>
-                </form>
+                <div className={style.b_body_container}>
+                  {cart.lines.edges.map((item) => {
+                    return (
+                      <>
+                        <BagProduct
+                          data={item.node}
+                          key={item.node.id}
+                          style={style}
+                          setCart={setCart}
+                          cartId={cartId}
+                        />
+                        <div className="separator"></div>
+                      </>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-            <div className="separator"></div>
-          </>
-        )}
-        <div className={style.b_buttons}>
-          {cart.items.length > 0 && (
-            <>
-              <div className={style.b_subtotal}>
-                <p>SUBTOTAL:</p>
-                <bdi className="price">
-                  <span className="price_icon">$</span>
-                  {formatPrice(cart.totalPrice + shippingPrice)}
-                </bdi>
+              <div className={style.b_bottom}>
+                <div className={style.b_buttons}>
+                  <div className={style.b_subtotal}>
+                    <p>SUBTOTAL:</p>
+                    <bdi className="price">
+                      <span className="price_icon">$</span>
+                      {formatPrice(parseInt(cart.cost.totalAmount.amount))}
+                    </bdi>
+                  </div>
+                  <a href={cart.checkoutUrl} className={style.b_btn_checkout}>
+                    FINALIZAR COMPRA
+                  </a>
+                  <Link
+                    href={"/productos"}
+                    className={style.b_btn_continue}
+                    onClick={() => setOpenBag(false)}
+                  >
+                    Seguir comprando
+                  </Link>
+                </div>
               </div>
-              <Link href={"/checkout"} className={style.b_btn_checkout}>
-                FINALIZAR COMPRA
-              </Link>
             </>
           )}
-          <Link
-            href={"/productos"}
-            className={style.b_btn_continue}
-            onClick={() => setOpenBag(false)}
-          >
-            Seguir comprando
-          </Link>
-        </div>
-      </div>
+        </>
+      )}
     </div>
   );
 }

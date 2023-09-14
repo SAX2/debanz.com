@@ -2,6 +2,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
+import { getTotalQuantityCart } from '../utils/shopify';
 
 export const CartContext = createContext();
 
@@ -14,6 +15,7 @@ export function CartContextProvider({ children }) {
     totalPrice: 0,
     totalUniqueItems: 0,
   });
+  const [totalQuantity, setTotalQuantity] = useState(0)
 
   useEffect(() => {
     const bag = localStorage.getItem('bag');
@@ -25,11 +27,19 @@ export function CartContextProvider({ children }) {
     localStorage.setItem('bag', JSON.stringify(cart));
   }, [cart]);
 
-  const countOfProducts = () => {
-    let count = 0;
-    cart.items.map(i => count = count + i.total);
-    return count;
+  const countOfProducts = async (id) => {
+    const {
+      data: { cart },
+    } = await getTotalQuantityCart(id);
+    if (cart == null) return;
+    return setTotalQuantity(cart.totalQuantity)
   }
+
+  useEffect(async () => {
+    const cartId = sessionStorage.getItem("cartId");
+    if (!cartId) return;
+    return await countOfProducts(cartId);
+  }, []);
 
   const addToBag = (item) => {
     const itemPrice = parseInt(item.price.split('.')[0]);
@@ -37,9 +47,8 @@ export function CartContextProvider({ children }) {
   
     if (existingProductIndex !== -1) {
       const existingProduct = cart.items[existingProductIndex];
-      if (existingProduct.total + 1 > existingProduct.stock) {
-        toast.error("No hay suficiente stock disponible");
-        return;
+      if ((existingProduct.total + 1) > existingProduct.stock[existingProduct.sizes.indexOf(existingProduct.size)]) {
+        return toast.error("No hay suficiente stock disponible");
       }
       existingProduct.total += 1;
   
@@ -57,7 +66,7 @@ export function CartContextProvider({ children }) {
         toast.error("No hay suficiente stock disponible");
         return;
       }
-      const newItems = [...cart.items, { ...item, total: 1 }];
+      const newItems = [...cart.items, { ...item }];
   
       setCart({
         ...cart,
@@ -66,21 +75,17 @@ export function CartContextProvider({ children }) {
         totalPrice: cart.totalPrice + itemPrice,
       });
     }
-  
-    toast.success("Añadido al carrito!", { duration: 1500 });
   };  
   
   const deleteFromBag = (item) => {
     const itemPrice = parseInt(item.price.split('.')[0]);
-    const newItems = cart.items.filter(
-      (i) => i.id !== item.id && i.size !== item.size
-    );
-  
+    const index = cart.items.findIndex((i) => i.id === item.id && i.size === item.size);
+    cart.items.splice(index, 1)
+
     setCart({
       ...cart,
-      items: newItems,
       totalItems: cart.totalItems - item.total,
-      totalPrice: cart.totalPrice - itemPrice * item.total,
+      totalPrice: cart.totalPrice - (itemPrice * item.total),
     });
   
     toast.success("Eliminado del carrito", { duration: 1500 });
@@ -119,6 +124,11 @@ export function CartContextProvider({ children }) {
   
     if (existingProductIndex !== -1) {
       const existingProduct = cart.items[existingProductIndex];
+      
+      if ((existingProduct.total + 1) > existingProduct.stock[existingProduct.sizes.indexOf(existingProduct.size)]) {
+        return toast.error("No hay suficiente stock disponible")
+      }
+
       existingProduct.total += 1;
   
       const newItems = [...cart.items];
@@ -164,7 +174,9 @@ export function CartContextProvider({ children }) {
         deleteFromBag,
         subtractCounter,
         addCounter,
-        clearCart
+        clearCart,
+        totalQuantity,
+        countOfProducts
       }}
     >
       {children}

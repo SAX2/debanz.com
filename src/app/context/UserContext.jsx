@@ -1,11 +1,13 @@
 "use client";
 import { createContext, useContext, useEffect, useState } from "react"
+import { useRouter } from "next/navigation";
 
 const UserContext = createContext();
 
 export default function UserContextProvider({ children }) {
   const [user, setUser] = useState({});
   const [checkoutInfo, setCheckoutInfo] = useState({});
+  const router = useRouter();
 
   useEffect(() => {
     const userLs = localStorage.getItem('user_auth');
@@ -33,13 +35,19 @@ export default function UserContextProvider({ children }) {
     }
   }
 
+  const CloseSession = () => {
+    setUser({});
+    return router.push("/panel/login");
+  };
+
   return (
     <UserContext.Provider value={{
       user,
       setUser,
       setCheckoutInfo,
       checkoutInfo,
-      getUser
+      getUser,
+      CloseSession
     }}>
       {children}
     </UserContext.Provider>

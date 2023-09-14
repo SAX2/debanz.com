@@ -1,98 +1,168 @@
-"use client";
 import Link from "next/link";
 import style from './footer.module.css';
-import { DebanzLogo, FacebookIcon, InstagramIcon } from "@/app/components/Icons";
-import { useState } from "react";
-
-const LinkGroup = ({ data }) => {
-  return (
-    <div className={style.lg}>
-      <h1 className={style.lg_title}>{data.title}</h1>
-      {data.links.map((link) => {
-        return (
-          <Link className={style.lg_link} href={link.path} key={link.path}>
-            {link.title}
-          </Link>
-        );
-      })}
-    </div>
-  );
-}
+import { InstagramIcon } from "@/app/components/Icons";
+import {
+  AMEX,
+  DinersClub,
+  Maestro,
+  MasterdCard,
+  MercadoPago,
+  Paypal,
+  Visa,
+} from "@/app/components/CardsIcons";
 
 export default function Footer() {
   const links = [
     {
-      title: "BRAND",
-      links: [
-        {
-          title: "PRODUCTOS",
-          path: "/productos"
-        }
-      ],
-    },
-    {
-      title: "CONTACTO & SOPORTE",
-      links: [
+      title: "INFO",
+      elements: [
         {
           title: "CONTACTO",
-          path: "/contacto"
+          path: "/contacto",
         },
         {
-          title: "ENVIOS",
-          path: "/evios"
+          title: "ENVIOS Y DEVOLUCIONES",
+          path: "/envios-y-devoluciones",
         },
         {
-          title: "DELVOLUCIONES Y CAMBIOS",
-          path: "/devoluciones-cambios"
+          title: "POLITICA DE REEMBOLSO",
+          path: "/politica-de-reembolso",
+        },
+        ,
+        {
+          title: "TERMINOS DEL SERVICIO",
+          path: "/terminos-del-servicio",
         },
       ],
     },
-  ];
-
-  const socialMedia = [
     {
-      url: "https://www.instagram.com/debanzba/",
-      icon: <InstagramIcon bg="#CCC" width={26} height="auto" />,
+      title: "LEGAL",
+      elements: [
+        {
+          title: "TERMINOS Y CONDICIONES",
+          path: "/terminos-y-condiciones",
+        },
+        {
+          title: "POLITICA DE PRIVACIDAD",
+          path: "/politica-de-privacidad",
+        },
+      ],
     },
     {
-      url: "https://www.facebook.com/profile.php?id=100086655642017",
-      icon: <FacebookIcon bg="#CCC" width={26} height="auto" />,
+      type: "no-link",
+      title: "clientes@debanz.com",
+      elements: [
+        {
+          content: "Horario de Atencion al Cliente:",
+        },
+        {
+          content: "Lunes a Domingo: 9:00 - 18:00 ",
+        },
+      ],
+      social: [
+        {
+          icon: <InstagramIcon width={15} height={15} bg={"var(--grey)"}/>,
+          src: "https://www.instagram.com/debanzba/"
+        }
+      ]
     },
   ];
 
-  const [emailValue, setEmailValue] = useState("");
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // fetch('', )
-  }
+  const cards = [
+    {
+      name: "DinersClub",
+      icon: <DinersClub />
+    },
+    {
+      name: "AMEX",
+      icon: <AMEX />
+    },
+    {
+      name: "MasterdCard",
+      icon: <MasterdCard />
+    },
+    {
+      name: "Visa",
+      icon: <Visa />
+    },
+    {
+      name: "Paypal",
+      icon: <Paypal />
+    },
+    {
+      name: "MercadoPago",
+      icon: <MercadoPago />
+    },
+    {
+      name: "Maestro",
+      icon: <Maestro />
+    },
+  ]
 
   return (
     <footer className={style.footer}>
-      <div className={style.left_c}>
-        <div className={style.social_container}>
-          <div>
-            <DebanzLogo width={150} heigth="auto" bg="#000" />
-            <a href="mailto:clientes@debanzba.com">clientes@debanzba.com</a>
-          </div>
-          <div>
-            {socialMedia.map(s => {
-              return <a href={s.url} target="_blank" key={s.url} >{s.icon}</a>;
-            })}
-          </div>
-        </div>
-        <div className={style.lg_container}>
-          {links.map((group) => {
-            return <LinkGroup data={group} key={group.title} />;
+      <div className={style.links}>
+        {links.map(section => {
+          return (
+            <div className={style.section}>
+              <div className={style.section_title}>{section.title}</div>
+              <div className={style.section_items}>
+                {section.type != "no-link" ? (
+                  <>
+                    {section.elements.map((element) => {
+                      return (
+                        <Link
+                          key={element.title}
+                          className={style.section_link}
+                          href={element.path}
+                        >
+                          {element.title}
+                        </Link>
+                      );
+                    })}
+                  </>
+                ) : (
+                  <>
+                    {section.elements.map((element) => {
+                      return (
+                        <div
+                          className={`${style.section_link} ${style.noLink}`}
+                        >
+                          {element.content}
+                        </div>
+                      );
+                    })}
+                  </>
+                )}
+              </div>
+              {section.social && (
+                <div className={style.social}>
+                  {section.social.map((social) => {
+                    return (
+                      <a
+                        href={social.src}
+                        key={social.src}
+                        className={style.section_link}
+                        target="_blank"
+                      >
+                        {social.icon}
+                      </a>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+      <div className={style.foot}>
+        <h1>Debanz™</h1>
+        <div className={`${style.divider} divider_black`}></div>
+        <div className={style.cards}>
+          {cards.map(card => {
+            return <div>{card.icon}</div>
           })}
         </div>
-      </div>
-      <div className={style.rigth_c}>
-        <p>ÚNETE CON TU CORREO ELECTRONICO PARA OBTENER UN 10% OFF EN TU PRIMER COMPRA</p>
-        <form onSubmit={(e) => handleSubmit(e)} className={style.form}>
-          <input type="text" placeholder="Correo electronico"/>
-          <button type="submit">ÚNETE</button>
-        </form>
       </div>
     </footer>
   );

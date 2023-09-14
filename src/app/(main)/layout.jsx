@@ -1,18 +1,19 @@
-import dynamic from 'next/dynamic';
 import Toast from './Toast';
 import Footer from './components/footer/Footer';
 import Outstanding from './components/outstanding/Outstanding';
 import Announce from './components/announces/Announce';
-const Navbar = dynamic(() => import('./components/navbar/Navbar'), { ssr: false });
+import CookiesCard from './components/cookies/CookiesCard';
+import Divider from '../components/Divider';
+import NavbarServer from './components/navbar/NavbarServer';
 
 export default function layout({ children }) {
   return (
     <>
-      <Navbar />
+      <NavbarServer />
       <main>{children}</main>
-      <Outstanding />
+      <Divider dark={false}/>
       <Footer />
-      <Announce desc="DEBANZ"/>
+      <CookiesCard />
       <Toast />
     </>
   );

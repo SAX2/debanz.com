@@ -3,11 +3,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 7px 1rem;
-  background: #000;
+  height: 30px;
+  background: var(--black);
+  color: var(--white);
 }
 
 .container p {
-  font-size: .8rem;
-  color: #fff;
+  font-size: var(--text-sm);
+  padding: 0 50px;
+}
+
+@media (max-width: 768px) {
+  .container p {
+    padding: 0 2rem;
+  }
 }

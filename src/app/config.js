@@ -1,5 +1,5 @@
 export default function domain(path) {
-  return `http://localhost:4000${path}`;
+  return `https://api.debanz.com${path}`;
 }
 
 export const shipmentApiUrl = (path) => `https://api.shipnow.com.ar${path}`;
@@ -16,6 +16,15 @@ export const getShipmentPrice = async ({ zip_code, weight }) => {
     }
   );
   const data = await response.json();
-  console.log(`/shipping_options?weight=${weight}&to_zip_code=${zip_code}&types=ship_pap`)
   return data.results[0];
+};
+
+export const getShippingData = async ({ id }) => {
+  const response = await fetch(shipmentApiUrl(`/orders/${id}`), {
+    headers: {
+      Authorization: `Bearer ${process.env.SHIPNOWTOKEN}`,
+    },
+  });
+  const data = await response.json();
+  return data;
 };

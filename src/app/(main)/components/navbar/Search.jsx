@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import domain from '@/app/config';
 import Product from '../product/Product';
 
-export default function Search({ setOpenSearch }) {
+export default function Search({ setOpenSearch, setStyleClass }) {
   const [search, setSearch] = useState('');
   const [products, setProducts] = useState([]);
   const [isEmpty, setIsEmpty] = useState(false);
@@ -51,32 +51,36 @@ export default function Search({ setOpenSearch }) {
 
 
   return (
-    <div className={style.s_container}>
-      <div className={style.s_head_container}>
-        <div>
-          <p>BUSCAR</p>
-          <button
-            className={style.m_close_button}
-            onClick={() => setOpenSearch((s) => !s)}
-          >
-            <CloseIcon bg="#000" width={20} heigth={20} />
-          </button>
-        </div>
-        <div>
-          <input
-            type="text"
-            className={style.input}
-            placeholder="Buscar..."
-            onChange={(e) => setSearch(e.target.value)}
-          />
-          <Loader />
-        </div>
+    <div className={style.search_container}>
+      <div className={style.s_input_container}>
+        <input
+          type="text"
+          className={style.input}
+          placeholder="¿Que estas buscando?"
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <button
+          className={style.m_close_button}
+          onClick={() => {
+            setStyleClass(true);
+            setTimeout(() => {
+              setStyleClass(false);
+              setOpenSearch((s) => !s);
+            }, 400);
+          }}
+        >
+          <CloseIcon bg="#000" width={20} heigth={20} />
+        </button>
       </div>
-      <div className={style.s_body_container}>
+      {/* <div className={style.s_body_container}>
         {products.length > 0 && search.length > 0 ? (
           <div className={style.s_product_list}>
             {products.map((p) => (
-              <div key={p.id} onClick={() => setOpenSearch(false)} style={{ width: "100%" }}>
+              <div
+                key={p.id}
+                onClick={() => setOpenSearch(false)}
+                style={{ width: "100%" }}
+              >
                 <Product data={p} />
               </div>
             ))}
@@ -88,7 +92,7 @@ export default function Search({ setOpenSearch }) {
               : null}
           </p>
         )}
-      </div>
+      </div> */}
     </div>
   );
 }
