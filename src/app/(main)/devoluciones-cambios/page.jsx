@@ -2,6 +2,11 @@ import React from 'react';
 import style from './page.module.css';
 import Link from 'next/link';
 
+export const metadata = {
+  title: 'Devoluciones y Cambios | Debanz',
+  description: "Obtén información sobre cómo realizar cambios y devoluciones de productos.",
+}
+
 export default function page() {
   return (
     <main className={style.main}>

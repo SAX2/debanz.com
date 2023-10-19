@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
   title: 'Debanz | Explora la moda sin límites.',
-  description: "Debanz - Marca de ropa en Argentina. Envíos a todo el país. Descubre nuestras exclusivas remeras del drop 'Collpase'. Estilo y calidad unidos en cada prenda.",
+  description: "Debanz, mucho más que una simple marca de ropa. Somos una plataforma creativa para los que no encajan en el molde. Ofrecemos envíos a todo el país en Argentina. Descubre la libertad de expresión a través de nuestra moda única. Envío rápido y seguro. Métodos de pago seguros. Calidad excepcional en cada prenda. Debanz, la marca de ropa streetwear de Argentina.",
   keywords: "Debanz, ropa, marca, Argentina, remeras, Collpase, moda, envíos",
   author: "Debanz",
   viewport: "width=device-width, initial-scale=1.0",

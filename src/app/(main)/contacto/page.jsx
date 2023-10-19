@@ -1,6 +1,11 @@
 import { FacebookIcon, InstagramIcon } from '@/app/components/Icons';
 import style from './contacto.module.css';
 
+export const metadata = {
+  title: 'Contacto | Debanz',
+  description: "Estamos aquí para ayudarte. Encuentra nuestras opciones de contacto y comunícate con nosotros para consultas, comentarios o asistencia.",
+}
+
 export default function page() {
   const socialMedia = [
     {

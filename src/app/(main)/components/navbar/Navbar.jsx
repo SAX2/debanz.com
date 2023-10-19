@@ -81,7 +81,7 @@ const Menu = ({ setOnMenuOpen, setStyleClass }) => {
           </button>
         </div>
         <div className={style.m_body}>
-          {routes.map((item) => {
+          {routes.map((item, index) => {
             if (item.isDropdown) {
               return <Dropdown item={item} setOnMenuOpen={setOnMenuOpen} />;
             } else {
@@ -91,6 +91,7 @@ const Menu = ({ setOnMenuOpen, setStyleClass }) => {
                   className={style.m_route}
                   href={item.path}
                   onClick={() => setOnMenuOpen((menu) => !menu)}
+                  style={{ animationDuration: index == 0 ? '1s' : `${1000 + (250 * index)}ms`}}
                 >
                   {item.title.toUpperCase()}
                 </Link>
@@ -100,15 +101,15 @@ const Menu = ({ setOnMenuOpen, setStyleClass }) => {
         </div>
       </div>
       <div className={style.m_bottom_container}>
+        <div className={style.horizontalSeparator}></div>
         <div className={style.m_options}>
-          <div className={style.social_media}>
-            <a href="https://www.instagram.com/debanzba/" target="_blank">
-              <InstagramIcon bg="#000" width={25} height={25} />
-            </a>
-            <a href="https://www.facebook.com/profile.php?id=100086655642017" target="_blank">
-              <FacebookIcon bg="#000" width={25} height={25} />
-            </a>
+          <div className={style.m_options_item}>
+            <p>ARS</p>
           </div>
+          <div className={style.verticalSeparator}></div>
+          <a href="https://www.instagram.com/debanzba/" target="_blank" className={style.m_options_item}>
+            <InstagramIcon bg="var(--grey2)" width={20} height={20} />
+          </a>
         </div>
       </div>
     </nav>
@@ -126,22 +127,39 @@ const MenuButton = ({ setOnMenuOpen }) => {
   );
 };
 
-const MenuComponent = ({ setOpenFn, setStyleFn, children, openStatus, styleStatus, customStyle, top, mainClass }) => {
+const MenuComponent = ({
+  setOpenFn,
+  setStyleFn,
+  children,
+  openStatus,
+  styleStatus,
+  customStyle,
+  top,
+  mainClass,
+  zIndex
+}) => {
   const styleAlias = {
     s_container: `${customStyle}_container`,
     s_off: `${customStyle}_off`,
   };
 
-
   return (
     <div className={mainClass?.active ? style.search : style.menu}>
       <div className={openStatus ? style.menu_open : style.menu_closed}>
-        <div className={`${styleStatus ? style[styleAlias.s_off] : style[styleAlias.s_container]}`}>
+        <div
+          className={`${
+            styleStatus
+              ? style[styleAlias.s_off]
+              : style[styleAlias.s_container]
+          }`}
+        >
           {children}
         </div>
         <div
-          style={top && { top: top }}
-          className={`backgorund-modal ${styleStatus ? 'backgorund-modal-close' : ""}`}
+          style={{ top: top && top, zIndex: zIndex && zIndex }}
+          className={`backgorund-modal ${
+            styleStatus ? "backgorund-modal-close" : ""
+          }`}
           onClick={() => {
             setStyleFn(true);
             setTimeout(() => {
@@ -153,7 +171,7 @@ const MenuComponent = ({ setOpenFn, setStyleFn, children, openStatus, styleStatu
       </div>
     </div>
   );
-}
+};
 
 export default function Navbar() {
   const [onMenuOpen, setOnMenuOpen] = useState(false);
@@ -223,28 +241,29 @@ export default function Navbar() {
         )}
       </div>
 
-      <div className={style.zIndex_search}>
-        <MenuComponent
-          setStyleFn={setStyleClassSearch}
-          setOpenFn={setOpenSearch}
-          openStatus={openSearch}
-          styleStatus={styleClassSearch}
-          customStyle={"search"}
-          top={86}
-          mainClass={{
-            active: true,
-          }}
-        >
-          <Search
-            setOpenSearch={setOpenSearch}
-            setStyleClass={setStyleClassSearch}
-          />
-        </MenuComponent>
-      </div>
-
       <Announce desc="COLLAPSE DROP 001" top={false} />
 
       <div className={style.nav}>
+        <div className={style.zIndex_search}>
+          <MenuComponent
+            setStyleFn={setStyleClassSearch}
+            setOpenFn={setOpenSearch}
+            openStatus={openSearch}
+            styleStatus={styleClassSearch}
+            customStyle={"search"}
+            zIndex={-1}
+            top={40}
+            mainClass={{
+              active: true,
+            }}
+          >
+            <Search
+              setOpenSearch={setOpenSearch}
+              setStyleClass={setStyleClassSearch}
+            />
+          </MenuComponent>
+        </div>
+
         <nav className={style.container}>
           <div className={style.navigation}>
             <div className={style.left_section}>
@@ -276,6 +295,8 @@ export default function Navbar() {
                       if (item.type == "bag")
                         return setOpenBag((openBag) => !openBag);
                       else if (item.type == "search") {
+                        if (openSearch == false)
+                          return setOpenSearch((openSearch) => !openSearch);
                         setStyleClassSearch(true);
                         setTimeout(() => {
                           setStyleClassSearch(false);
