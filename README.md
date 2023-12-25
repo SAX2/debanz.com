@@ -26,8 +26,8 @@ Welcome to the Debanz E-commerce project developed with Next.js 13. This project
 
 3. Configure enviroment keys:
 
-- SHOPIFY_PUBLIC_API_URL=your-shopify-store.myshopify.com
-- SHOPIFY_ACCESS_TOKEN=your-shopify-storefront-api-token
+- **SHOPIFY_PUBLIC_API_URL**=your-shopify-store.myshopify.com
+- **SHOPIFY_ACCESS_TOKEN**=your-shopify-storefront-api-token
 
 4. Start the application in development mode:
 
