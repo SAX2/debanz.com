@@ -22,7 +22,6 @@ Welcome to the Debanz E-commerce project developed with Next.js 13. This project
 2. Install project dependencies:
 
    ```bash
-   cd debanz-e-commerce-nextjs
    npm install
 
 3. Configure enviroment keys:
