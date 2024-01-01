@@ -2,7 +2,7 @@
 
 ![image](https://github.com/SAX2/debanz.com/assets/91171834/085acebb-fb3b-40bd-a03e-d9f599491c01)
 
-Welcome to the Debanz E-commerce project developed with Next.js 13. This project serves as a showcase for [debanz.com](https://debanz.com), utilizing Shopify to provide product data, shopping cart functionality, and order management.
+Welcome to the Debanz E-commerce project developed with Next.js 13. This project serves as a showcase for [debanz.com](https://debanz.com), utilizing Shopify to provide product data, shopping cart functionality, and order management. The app uses Shopify's GraphQL API to get all the store data.
 
 ## Key Features
 
