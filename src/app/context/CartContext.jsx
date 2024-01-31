@@ -1,30 +1,31 @@
 "use client";
-import { createContext, useContext, useEffect, useState } from 'react';
-import { toast } from 'sonner';
-import { v4 as uuidv4 } from 'uuid';
-import { getTotalQuantityCart } from '../utils/shopify';
+import { createContext, useContext, useEffect, useState } from "react";
+import { toast } from "sonner";
+import { v4 as uuidv4 } from "uuid";
+import { getTotalQuantityCart } from "../utils/shopify";
 
 export const CartContext = createContext();
 
 export function CartContextProvider({ children }) {
   const [cart, setCart] = useState({
-    id: '',
+    id: "",
     isEmpty: true,
     items: [],
     totalItems: 0,
     totalPrice: 0,
     totalUniqueItems: 0,
   });
-  const [totalQuantity, setTotalQuantity] = useState(0)
+  const [totalQuantity, setTotalQuantity] = useState(0);
 
   useEffect(() => {
-    const bag = localStorage.getItem('bag');
-    if (!bag || bag.length <= 0) return localStorage.setItem('bag', JSON.stringify(cart));
+    const bag = localStorage.getItem("bag");
+    if (!bag || bag.length <= 0)
+      return localStorage.setItem("bag", JSON.stringify(cart));
     return setCart(JSON.parse(bag));
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('bag', JSON.stringify(cart));
+    localStorage.setItem("bag", JSON.stringify(cart));
   }, [cart]);
 
   const countOfProducts = async (id) => {
@@ -32,29 +33,36 @@ export function CartContextProvider({ children }) {
       data: { cart },
     } = await getTotalQuantityCart(id);
     if (cart == null) return;
-    return setTotalQuantity(cart.totalQuantity)
-  }
+    return setTotalQuantity(cart.totalQuantity);
+  };
 
   useEffect(async () => {
     const cartId = sessionStorage.getItem("cartId");
     if (!cartId) return;
-    return await countOfProducts(cartId);
+    return await countOfProducts(1);
   }, []);
 
   const addToBag = (item) => {
-    const itemPrice = parseInt(item.price.split('.')[0]);
-    const existingProductIndex = cart.items.findIndex((i) => i.id === item.id && i.size === item.size);
-  
+    const itemPrice = parseInt(item.price.split(".")[0]);
+    const existingProductIndex = cart.items.findIndex(
+      (i) => i.id === item.id && i.size === item.size,
+    );
+
     if (existingProductIndex !== -1) {
       const existingProduct = cart.items[existingProductIndex];
-      if ((existingProduct.total + 1) > existingProduct.stock[existingProduct.sizes.indexOf(existingProduct.size)]) {
+      if (
+        existingProduct.total + 1 >
+        existingProduct.stock[
+          existingProduct.sizes.indexOf(existingProduct.size)
+        ]
+      ) {
         return toast.error("No hay suficiente stock disponible");
       }
       existingProduct.total += 1;
-  
+
       const newItems = [...cart.items];
       newItems[existingProductIndex] = existingProduct;
-  
+
       setCart({
         ...cart,
         items: newItems,
@@ -67,7 +75,7 @@ export function CartContextProvider({ children }) {
         return;
       }
       const newItems = [...cart.items, { ...item }];
-  
+
       setCart({
         ...cart,
         items: newItems,
@@ -75,40 +83,43 @@ export function CartContextProvider({ children }) {
         totalPrice: cart.totalPrice + itemPrice,
       });
     }
-  };  
-  
+  };
+
   const deleteFromBag = (item) => {
-    const itemPrice = parseInt(item.price.split('.')[0]);
-    const index = cart.items.findIndex((i) => i.id === item.id && i.size === item.size);
-    cart.items.splice(index, 1)
+    const itemPrice = parseInt(item.price.split(".")[0]);
+    const index = cart.items.findIndex(
+      (i) => i.id === item.id && i.size === item.size,
+    );
+    cart.items.splice(index, 1);
 
     setCart({
       ...cart,
       totalItems: cart.totalItems - item.total,
-      totalPrice: cart.totalPrice - (itemPrice * item.total),
+      totalPrice: cart.totalPrice - itemPrice * item.total,
     });
-  
+
     toast.success("Eliminado del carrito", { duration: 1500 });
   };
-  
+
   const subtractCounter = (id) => {
     const itemIndex = cart.items.findIndex((item) => item.id === id);
-  
+
     if (itemIndex === -1) {
       return;
     }
-  
+
     const product = cart.items[itemIndex];
     const newItems = [...cart.items];
-    const newTotalPrice = cart.totalPrice - parseInt(product.price.split('.')[0]);
-  
+    const newTotalPrice =
+      cart.totalPrice - parseInt(product.price.split(".")[0]);
+
     if (product.total === 1) {
       newItems.splice(itemIndex, 1);
     } else {
       product.total = product.total - 1;
       newItems[itemIndex] = product;
     }
-  
+
     setCart({
       ...cart,
       items: newItems,
@@ -117,23 +128,30 @@ export function CartContextProvider({ children }) {
       totalUniqueItems: newItems.length,
     });
   };
-  
+
   const addCounter = (item) => {
-    const itemPrice = parseInt(item.price.split('.')[0]);
-    const existingProductIndex = cart.items.findIndex((i) => i.id === item.id && i.size === item.size);
-  
+    const itemPrice = parseInt(item.price.split(".")[0]);
+    const existingProductIndex = cart.items.findIndex(
+      (i) => i.id === item.id && i.size === item.size,
+    );
+
     if (existingProductIndex !== -1) {
       const existingProduct = cart.items[existingProductIndex];
-      
-      if ((existingProduct.total + 1) > existingProduct.stock[existingProduct.sizes.indexOf(existingProduct.size)]) {
-        return toast.error("No hay suficiente stock disponible")
+
+      if (
+        existingProduct.total + 1 >
+        existingProduct.stock[
+          existingProduct.sizes.indexOf(existingProduct.size)
+        ]
+      ) {
+        return toast.error("No hay suficiente stock disponible");
       }
 
       existingProduct.total += 1;
-  
+
       const newItems = [...cart.items];
       newItems[existingProductIndex] = existingProduct;
-  
+
       setCart({
         ...cart,
         items: newItems,
@@ -142,7 +160,7 @@ export function CartContextProvider({ children }) {
       });
     } else {
       const newItems = [...cart.items, { ...item, total: 1 }];
-  
+
       setCart({
         ...cart,
         items: newItems,
@@ -160,9 +178,9 @@ export function CartContextProvider({ children }) {
       items: [],
       totalItems: 0,
       totalPrice: 0,
-      totalUniqueItems: 0
+      totalUniqueItems: 0,
     });
-  }
+  };
 
   return (
     <CartContext.Provider
@@ -176,7 +194,7 @@ export function CartContextProvider({ children }) {
         addCounter,
         clearCart,
         totalQuantity,
-        countOfProducts
+        countOfProducts,
       }}
     >
       {children}

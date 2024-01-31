@@ -1,61 +1,14 @@
 import { getSingleProduct } from "@/app/utils/shopify";
 import { AccordionComponent, Price } from "./ClientComponents";
+import { CollapseLogo } from "@/app/components/Icons";
 import Link from "next/link";
 import style from "./product.module.css";
 import Image from "next/image";
-import { CollapseLogo } from "@/app/components/Icons";
-// import CollapseLogo from '../../../../../public/SVG.svg';
-
-// const fetchProduct = async ({ productId }) => {
-//   const gql = String.raw;
-//   const getSingleProductQuery = gql`
-//     query SingleProduct($handle: String!) {
-//       product(handle: $handle) {
-//         title
-//         description
-//         updatedAt
-//         tags
-//         priceRange {
-//           minVariantPrice {
-//             amount
-//           }
-//         }
-//         images(first: 2) {
-//           edges {
-//             node {
-//               url
-//               altText
-//             }
-//           }
-//         }
-//         variants(first: 3) {
-//           edges {
-//             node {
-//               id
-//               title
-//               currentlyNotInStock
-//             }
-//           }
-//         }
-//       }
-//     }
-//   `;
-//   const data = await storefront(getSingleProductQuery, productId);
-//   return data;
-// }
+import Products from '@/app/utils/data.js';
 
 export default async function MainProductCard({ productId, title, bubble }) {
-  // const { data: { product } } = await getSingleProduct({productId, maxImages: 2});
-  const {
-    data: { product },
-  } = await getSingleProduct({
-    productName: productId,
-  });
-
+  const product = Products.filter(product => product.id === productId)[0];
   const image = product.images.edges[0];
-  const allVariantsNotInStock = product.variants.edges
-    .map((variant) => variant.node.currentlyNotInStock)
-    .every((currentlyNotInStock) => currentlyNotInStock);
 
   return (
     <div className={style.container}>
@@ -70,11 +23,12 @@ export default async function MainProductCard({ productId, title, bubble }) {
         <div className={style.title}>
           <div>
             <h1>{product.title}</h1>
-            {allVariantsNotInStock && (
+            {/* Uncomment this */}
+            {/* {allVariantsNotInStock && (
               <div className={style.bubble}>
                 <p>Sin Stock</p>
               </div>
-            )}
+            )} */} 
           </div>
           <Price price={product.priceRange.minVariantPrice.amount} />
         </div>

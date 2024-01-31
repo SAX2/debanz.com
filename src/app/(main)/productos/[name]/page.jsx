@@ -4,6 +4,7 @@ import ProductInfo from "./ProductInfo";
 import Images from "./components/images/Images";
 import MigthLike from "./components/migthlike/MigthLike";
 import style from './productById.module.css'
+import Products from "@/app/utils/data";
 
 function reemplazarEspacios(string) {
   if (string.includes(' ')) {
@@ -13,17 +14,11 @@ function reemplazarEspacios(string) {
 }
 
 export async function generateMetadata({ params }) {
-  const { name } = params;
- 
-  // const product = await fetch(
-  //   domain(`/products/name/${reemplazarEspacios(name)}`),
-  //   { next: { revalidate: 60 } }
-  // ).then((res) => res.json());
-  const { data } = await storefront(singleProductQuery, { handle: params.name });
- 
+  const data = Products.filter(product => product.id === params.name)[0]
+
   return {
-    title: data.product.title,
-    description: data.product.description,
+    title: data.title,
+    description: data.description,
     keywords: "Debanz, ropa, marca, Argentina, remeras, Collpase, moda, envíos",
     author: "Debanz",
     viewport: "width=device-width, initial-scale=1.0",
@@ -31,59 +26,17 @@ export async function generateMetadata({ params }) {
   }
 }
 
-// async function fetchProduct({ name }) {
-//   const res = await fetch(domain(`/products/name/${reemplazarEspacios(name)}`), { next: { revalidate: 60 } });
-//   const data = await res.json();
-//   return data;
-// }
-const gql = String.raw
-
-const singleProductQuery = gql`
-  query SingleProduct($handle: String!) {
-    product(handle: $handle) {
-      title
-      description
-      updatedAt
-      tags
-      priceRange {
-        minVariantPrice {
-          amount
-        }
-      }
-      images(first: 2) {
-        edges {
-          node {
-            url
-            altText
-          }
-        }
-      }
-      variants(first: 3) {
-        edges {
-          node {
-            id
-            title
-            currentlyNotInStock
-          }
-        }
-      }
-    }
-  }
-`;
-
-
 export default async function page({ params, cartId }) {
-  const { data } = await storefront(singleProductQuery, { handle: params.name });
-  console.log(cartId)
+  const data = Products.filter(product => product.id === params.name)[0]
 
   return (
     <main className={style.container}>
       <div className={style.subcontainer}>
         <section className={`${style.section} ${style.images}`}>
-          <Images data={data.product.images} style={style}/>
+          <Images data={data.images} style={style}/>
         </section>
         <section className={style.ProductInfo}>
-          <ProductInfo data={data.product} />
+          <ProductInfo data={data} />
         </section>
       </div>
       
