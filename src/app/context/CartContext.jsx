@@ -34,7 +34,7 @@ export function CartContextProvider({ children }) {
     } = await getTotalQuantityCart(id);
     if (cart == null) return;
     // return setTotalQuantity(cart.totalQuantity)
-    return setTotalQuantity(1); //delete
+    return setTotalQuantity(cart.totalQuantity); //delete
   };
 
   useEffect(async () => {

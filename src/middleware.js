@@ -2,14 +2,6 @@ import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs";
 import { NextResponse } from "next/server";
 
 export async function middleware(req) {
-  const res = NextResponse.next();
-
-  //Web open: status == true; close: status == false;
-  const status = false;
-  if (status === false) {
-    return res;
-  }
-
   /*
     The application uses authentication middleware 
     so that in cases where the store wants to be closed
@@ -20,7 +12,11 @@ export async function middleware(req) {
   */
   // Read the docs to configure supabase auth
 
+  const res = NextResponse.next();
   const supabase = createMiddlewareClient({ req, res });
+
+  //Web open: status == true; close: status == false;
+  const status = false;
 
   const {
     data: { user },
